@@ -50,7 +50,7 @@ def getAreaMaxContour(contours):
     return area_max_contour, contour_area_max  # Return the largest contour
 
 # Angle when gripper is closed during picking
-servo1 = 400
+servo1 = 700
 
 # Initial position
 def initMove():
