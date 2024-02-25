@@ -1,8 +1,9 @@
+#!/usr/bin/python3
+# coding=utf8
 import sys
-import math
+sys.path.append('/home/pi/ArmPi/')
 import cv2
 import time
-import numpy as np
 import Camera
 import threading
 from LABConfig import *
