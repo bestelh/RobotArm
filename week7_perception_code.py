@@ -1,15 +1,34 @@
+import sys
+sys.path.append('/home/pi/ArmPi/')
+import cv2
+import time
+import Camera
+import threading
+from LABConfig import *
+from ArmIK.Transform import *
+from ArmIK.ArmMoveIK import *
+import HiwonderSDK.Board as Board
+from CameraCalibration.CalibrationConfig import *
 import cv2
 import numpy as np
 import math
+import time
 
-class PerceptionModule:
+class ColorTracking:
     def __init__(self):
-        self.roi = ()
+        self.color_range = {}
+        self.range_rgb = {}
+        self.frame_lab = None
+        self.size = (640, 480)
+        self.square_length = 0
+
+        self.roi = None
         self.rect = None
         self.count = 0
         self.track = False
         self.get_roi = False
         self.center_list = []
+        self.__isRunning = False
         self.unreachable = False
         self.detect_color = 'None'
         self.action_finish = True
@@ -22,67 +41,75 @@ class PerceptionModule:
         self.start_pick_up = False
         self.first_move = True
 
-    def get_area_max_contour(self, contours):
-        # Implementation of getAreaMaxContour function
+    def getAreaMaxContour(self, contours):
+        contour_area_temp = 0
+        contour_area_max = 0
+        area_max_contour = None
+
+        for c in contours:
+            contour_area_temp = math.fabs(cv2.contourArea(c))
+            if contour_area_temp > contour_area_max:
+                contour_area_max = contour_area_temp
+                if contour_area_temp > 300:
+                    area_max_contour = c
+
+        return area_max_contour, contour_area_max
+
+    def getMaskROI(self, frame, roi, size):
+        # Implement as needed
         pass
 
-    def initialize_servo_positions(self):
-        # Implementation of initializing servo positions
+    def initMove(self):
+        # Implement as needed
         pass
 
-    def set_buzzer(self, timer):
-        # Implementation of setting the buzzer
+    def setBuzzer(self, timer):
+        # Implement as needed
         pass
 
-    def set_rgb_lights(self, color):
-        # Implementation of setting RGB lights
+    def set_rgb(self, color):
+        # Implement as needed
         pass
 
-    def reset_variables(self):
-        # Implementation of resetting variables
-        pass
+    def run(self, img):
+        if not self.__isRunning:
+            return img
 
-    def process_frame(self, img):
-        img_copy = img.copy()
-        img_h, img_w = img.shape[:2]
-        cv2.line(img, (0, int(img_h / 2)), (img_w, int(img_h / 2)), (0, 0, 200), 1)
-        cv2.line(img, (int(img_w / 2), 0), (int(img_w / 2), img_h), (0, 0, 200), 1)
-
-        frame_resize = cv2.resize(img_copy, (640, 480), interpolation=cv2.INTER_NEAREST)
+        frame_resize = cv2.resize(img.copy(), self.size, interpolation=cv2.INTER_NEAREST)
         frame_gb = cv2.GaussianBlur(frame_resize, (11, 11), 11)
 
         if self.get_roi and self.start_pick_up:
             self.get_roi = False
-            frame_gb = self.get_mask_roi(frame_gb, self.roi, (640, 480))
+            frame_gb = self.getMaskROI(frame_gb, self.roi, self.size)
 
         frame_lab = cv2.cvtColor(frame_gb, cv2.COLOR_BGR2LAB)
 
         area_max = 0
         areaMaxContour = 0
         if not self.start_pick_up:
-            for i in color_range:
-                if i in self.__target_color:
+            for i in self.color_range:
+                if i in __target_color:
                     self.detect_color = i
-                    frame_mask = cv2.inRange(frame_lab, color_range[self.detect_color][0], color_range[self.detect_color][1])
+                    frame_mask = cv2.inRange(frame_lab, self.color_range[self.detect_color][0], self.color_range[self.detect_color][1])
                     opened = cv2.morphologyEx(frame_mask, cv2.MORPH_OPEN, np.ones((6, 6), np.uint8))
                     closed = cv2.morphologyEx(opened, cv2.MORPH_CLOSE, np.ones((6, 6), np.uint8))
                     contours = cv2.findContours(closed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)[-2]
-                    areaMaxContour, area_max = self.get_area_max_contour(contours)
+                    areaMaxContour, area_max = self.getAreaMaxContour(contours)
 
             if area_max > 2500:
                 self.rect = cv2.minAreaRect(areaMaxContour)
                 box = np.int0(cv2.boxPoints(self.rect))
 
-                self.roi = self.get_roi(box)
+                self.roi = self.getROI(box)
                 self.get_roi = True
 
-                img_centerx, img_centery = self.get_center(self.rect, self.roi, (640, 480), 10)
-                self.world_x, self.world_y = self.convert_coordinate(img_centerx, img_centery, (640, 480))
+                img_centerx, img_centery = self.getCenter(self.rect, self.roi, self.size, self.square_length)
+                self.world_x, self.world_y = self.convertCoordinate(img_centerx, img_centery, self.size)
 
-                cv2.drawContours(img, [box], -1, (0, 0, 255), 2)
+                cv2.drawContours(img, [box], -1, self.range_rgb[self.detect_color], 2)
                 cv2.putText(img, '(' + str(self.world_x) + ',' + str(self.world_y) + ')',
-                            (min(box[0, 0], box[2, 0]), box[2, 1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
-
+                            (min(box[0, 0], box[2, 0]), box[2, 1] - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.range_rgb[self.detect_color], 1)
                 distance = math.sqrt(pow(self.world_x - self.last_x, 2) + pow(self.world_y - self.last_y, 2))
                 self.last_x, self.last_y = self.world_x, self.world_y
                 self.track = True
@@ -109,20 +136,53 @@ class PerceptionModule:
 
         return img
 
-    # Additional helper methods can be added here
+    def main(self):
+        self.init()
+        self.start()
+        self.__target_color = ('red', )
+        my_camera = Camera.Camera()
+        my_camera.camera_open()
+        while True:
+            img = my_camera.frame
+            if img is not None:
+                frame = img.copy()
+                Frame = self.run(frame)
+                cv2.imshow('Frame', Frame)
+                key = cv2.waitKey(1)
+                if key == 27:
+                    break
+        my_camera.camera_close()
+        cv2.destroyAllWindows()
+
+    def init(self):
+        print("ColorTracking Init")
+        self.initMove()
+
+    def start(self):
+        self.reset()
+        self.__isRunning = True
+        print("ColorTracking Start")
+
+    def stop(self):
+        self.__isRunning = False
+        print("ColorTracking Stop")
+
+    def exit(self):
+        self.__isRunning = False
+        print("ColorTracking Exit")
+
+    def reset(self):
+        self.count = 0
+        self.track = False
+        self.get_roi = False
+        self.center_list = []
+        self.first_move = True
+        self.__target_color = ()
+        self.detect_color = 'None'
+        self.action_finish = True
+        self.start_pick_up = False
+        self.start_count_t1 = True
 
 if __name__ == '__main__':
-    perception_module = PerceptionModule()
-
-    # Example: Simulating image capture loop
-    while True:
-        img = cv2.imread("sample_image.jpg")  # Replace with actual image capture
-        if img is not None:
-            frame = img.copy()
-            perception_module.process_frame(frame)
-            cv2.imshow('Frame', frame)
-            key = cv2.waitKey(1)
-            if key == 27:
-                break
-
-    cv2.destroyAllWindows()
+    tracking = ColorTracking()
+    tracking.main()
