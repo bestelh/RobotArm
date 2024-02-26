@@ -110,8 +110,6 @@ def run(img):
 
     frame_lab = cv2.cvtColor(frame_gb, cv2.COLOR_BGR2LAB)
 
-    area_max = 0
-    areaMaxContour = 0
     for i in color_range:
         if i in __target_color:
             detect_color = i
@@ -120,23 +118,23 @@ def run(img):
             closed = cv2.morphologyEx(opened, cv2.MORPH_CLOSE, np.ones((6, 6), np.uint8))
             contours = cv2.findContours(closed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)[-2]
             areaMaxContour, area_max = getAreaMaxContour(contours)
-        if area_max > 2500:
-            rect = cv2.minAreaRect(areaMaxContour)
-            box = np.int0(cv2.boxPoints(rect))
+            if area_max > 2500:
+                rect = cv2.minAreaRect(areaMaxContour)
+                box = np.int0(cv2.boxPoints(rect))
 
-            roi = getROI(box)
-            get_roi = True
+                roi = getROI(box)
+                get_roi = True
 
-            img_centerx, img_centery = getCenter(rect, roi, size, square_length)
-            world_x, world_y = convertCoordinate(img_centerx, img_centery, size)
+                img_centerx, img_centery = getCenter(rect, roi, size, square_length)
+                world_x, world_y = convertCoordinate(img_centerx, img_centery, size)
 
-            # Store positions and locations for each color
-            positions[detect_color] = (img_centerx, img_centery)
-            locations[detect_color] = (world_x, world_y)
+                # Store positions and locations for each color
+                positions[detect_color] = (img_centerx, img_centery)
+                locations[detect_color] = (world_x, world_y)
 
-            cv2.drawContours(img, [box], -1, range_rgb[detect_color], 2)
-            cv2.putText(img, '(' + str(world_x) + ',' + str(world_y) + ')', (min(box[0, 0], box[2, 0]), box[2, 1] - 10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, range_rgb[detect_color], 1)
+                cv2.drawContours(img, [box], -1, range_rgb[detect_color], 2)
+                cv2.putText(img, '(' + str(world_x) + ',' + str(world_y) + ')', (min(box[0, 0], box[2, 0]), box[2, 1] - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, range_rgb[detect_color], 1)
 
     # Print positions and locations for each color
     print('Positions:', positions)
