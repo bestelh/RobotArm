@@ -21,7 +21,7 @@ range_rgb = {
     'white': (255, 255, 255),
 }
  
-__target_color = ('red',)
+__target_color = ('red', 'blue', 'green') 
 # Set the detection color
 def setTargetColor(target_color):
     global __target_color
@@ -158,7 +158,7 @@ def run(img):
  
 if __name__ == '__main__':
     start()
-    __target_color = ('red', )
+    __target_color = ('red', 'blue', 'green')  # Add 'blue' and 'green' to the target colors
     my_camera = Camera.Camera()
     my_camera.camera_open()
     while True:
