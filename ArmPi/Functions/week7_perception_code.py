@@ -1,17 +1,19 @@
 #!/usr/bin/python3
 # coding=utf8
 import sys
-sys.path.append('/home/pi/ArmPi/')
 import cv2
 import time
+import math
 import Camera
 import threading
+import numpy as np
 from LABConfig import *
 from ArmIK.Transform import *
 from ArmIK.ArmMoveIK import *
 import HiwonderSDK.Board as Board
 from CameraCalibration.CalibrationConfig import *
-import numpy as np
+
+sys.path.append('/home/pi/ArmPi/')
 
 range_rgb = {
     'red': (0, 0, 255),
@@ -21,21 +23,22 @@ range_rgb = {
     'white': (255, 255, 255),
 }
 
-class Perception:
-    def __init__(self):
-        self.__target_color = ('red', 'blue', 'green')
-        self.__isRunning = False
-        self.rect = None
-        self.size = (640, 480)
-        self.rotation_angle = 0
-        self.unreachable = False
-        self.world_X, self.world_Y = 0, 0
-        self.world_x, self.world_y = 0, 0
-        self.t1 = 0
-        self.roi = ()
-        self.get_roi = False
-        self.last_x, self.last_y = 0, 0
-        self.my_camera = Camera.Camera()
+class Perception: 
+
+    def __init__(self): 
+        self.__target_color = ('red', 'blue', 'green') 
+        self.__isRunning = False 
+        self.rect = None 
+        self.size = (640, 480) 
+        self.rotation_angle = 0 
+        self.unreachable = False 
+        self.world_X, self.world_Y = 0, 0 
+        self.world_x, self.world_y = 0, 0 
+        self.t1 = 0 
+        self.roi = () 
+        self.get_roi = False 
+        self.last_x, self.last_y = 0, 0 
+        self.my_camera = Camera.Camera() 
         self.my_camera.camera_open()
 
     def setTargetColor(self, target_color):
@@ -69,15 +72,6 @@ class Perception:
         print("ColorTracking Exit")
 
     def run(self, img):
-        global rect
-        global __isRunning
-        global detect_color
-        global rotation_angle
-        global last_x, last_y
-        global world_X, world_Y
-        global world_x, world_y
-        global start_count_t1, t1
-
         # Initialize dictionaries to store positions, locations, rois and get_rois for each color
         positions = {'red': None, 'blue': None, 'green': None}
         locations = {'red': None, 'blue': None, 'green': None}
@@ -89,35 +83,35 @@ class Perception:
         cv2.line(img, (0, int(img_h / 2)), (img_w, int(img_h / 2)), (0, 0, 200), 1)
         cv2.line(img, (int(img_w / 2), 0), (int(img_w / 2), img_h), (0, 0, 200), 1)
 
-        if not __isRunning:
+        if not self.__isRunning:
             return img
 
-        frame_resize = cv2.resize(img_copy, size, interpolation=cv2.INTER_NEAREST)
+        frame_resize = cv2.resize(img_copy, self.size, interpolation=cv2.INTER_NEAREST)
         frame_gb = cv2.GaussianBlur(frame_resize, (11, 11), 11)
 
         frame_lab = cv2.cvtColor(frame_gb, cv2.COLOR_BGR2LAB)
 
         for i in color_range:
-            if i in __target_color:
+            if i in self.__target_color:
                 detect_color = i
                 if get_rois[detect_color]:
                     get_rois[detect_color] = False
-                    frame_gb = getMaskROI(frame_gb, rois[detect_color], size)
+                    frame_gb = getMaskROI(frame_gb, rois[detect_color], self.size)
 
                 frame_mask = cv2.inRange(frame_lab, color_range[detect_color][0], color_range[detect_color][1])
                 opened = cv2.morphologyEx(frame_mask, cv2.MORPH_OPEN, np.ones((6, 6), np.uint8))
                 closed = cv2.morphologyEx(opened, cv2.MORPH_CLOSE, np.ones((6, 6), np.uint8))
                 contours = cv2.findContours(closed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)[-2]
-                areaMaxContour, area_max = getAreaMaxContour(contours)
+                areaMaxContour, area_max = self.getAreaMaxContour(contours)
                 if area_max > 2500:
-                    rect = cv2.minAreaRect(areaMaxContour)
-                    box = np.int0(cv2.boxPoints(rect))
+                    self.rect = cv2.minAreaRect(areaMaxContour)
+                    box = np.int0(cv2.boxPoints(self.rect))
 
                     rois[detect_color] = getROI(box)
                     get_rois[detect_color] = True
 
-                    img_centerx, img_centery = getCenter(rect, rois[detect_color], size, square_length)
-                    world_x, world_y = convertCoordinate(img_centerx, img_centery, size)
+                    img_centerx, img_centery = getCenter(self.rect, rois[detect_color], self.size, square_length)
+                    world_x, world_y = convertCoordinate(img_centerx, img_centery, self.size)
 
                     # Store positions and locations for each color
                     positions[detect_color] = (img_centerx, img_centery)
