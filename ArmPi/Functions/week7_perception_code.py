@@ -14,13 +14,6 @@ from ArmIK.ArmMoveIK import *
 import HiwonderSDK.Board as Board
 from CameraCalibration.CalibrationConfig import *
 
-range_rgb = {
-    'red': (0, 0, 255),
-    'blue': (255, 0, 0),
-    'green': (0, 255, 0),
-    'black': (0, 0, 0),
-    'white': (255, 255, 255),
-}
 
 class Perception: 
 
@@ -39,6 +32,13 @@ class Perception:
         self.last_x, self.last_y = 0, 0 
         self.my_camera = Camera.Camera() 
         self.my_camera.camera_open()
+        self.range_rgb = {
+            'red': (0, 0, 255),
+            'blue': (255, 0, 0),
+            'green': (0, 255, 0),
+            'black': (0, 0, 0),
+            'white': (255, 255, 255),}
+
 
     def setTargetColor(self, target_color):
         self.__target_color = target_color
@@ -71,7 +71,6 @@ class Perception:
         print("ColorTracking Exit")
 
     def run(self, img):
-        # Initialize dictionaries to store positions, locations, rois and get_rois for each color
         positions = {'red': None, 'blue': None, 'green': None}
         locations = {'red': None, 'blue': None, 'green': None}
         rois = {'red': None, 'blue': None, 'green': None}
@@ -112,17 +111,15 @@ class Perception:
                     img_centerx, img_centery = getCenter(self.rect, rois[detect_color], self.size, square_length)
                     world_x, world_y = convertCoordinate(img_centerx, img_centery, self.size)
 
-                    # Store positions and locations for each color
                     positions[detect_color] = (img_centerx, img_centery)
                     locations[detect_color] = (world_x, world_y)
 
-                    cv2.drawContours(img, [box], -1, range_rgb[detect_color], 2)
+                    cv2.drawContours(img, [box], -1, self.range_rgb[detect_color], 2)
                     cv2.putText(img, '(' + str(world_x) + ',' + str(world_y) + ')', (min(box[0, 0], box[2, 0]), box[2, 1] - 10),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, range_rgb[detect_color], 1)
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.range_rgb[detect_color], 1)
 
-        # Print positions and locations for each color
-        print('Positions:', positions)
-        print('Locations:', locations)
+        # print('Positions:', positions)
+        # print('Locations:', locations)
 
         return img
 
