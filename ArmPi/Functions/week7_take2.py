@@ -101,10 +101,10 @@ class Perception:
         return img
 
     def run(self, img):
-        positions = {'red': None, 'blue': None, 'green': None}
-        locations = {'red': None, 'blue': None, 'green': None}
-        rois = {'red': None, 'blue': None, 'green': None}
-        get_rois = {'red': False, 'blue': False, 'green': False}
+        self.positions = {'red': None, 'blue': None, 'green': None}
+        self.locations = {'red': None, 'blue': None, 'green': None}
+        self.rois = {'red': None, 'blue': None, 'green': None}
+        self.get_rois = {'red': False, 'blue': False, 'green': False}
 
         img_copy = img.copy()
 
