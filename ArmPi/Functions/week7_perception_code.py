@@ -22,14 +22,8 @@ class Perception:
         self.__isRunning = False 
         self.rect = None 
         self.size = (640, 480) 
-        #self.rotation_angle = 0 
-        #self.unreachable = False 
-        # self.world_X, self.world_Y = 0, 0 
-        # self.world_x, self.world_y = 0, 0 
-        #self.t1 = 0 
         self.roi = () 
         self.get_roi = False 
-        #self.last_x, self.last_y = 0, 0 
         self.my_camera = Camera.Camera() 
         self.my_camera.camera_open()
         self.range_rgb = {
@@ -89,9 +83,10 @@ class Perception:
 
         frame_lab = cv2.cvtColor(frame_gb, cv2.COLOR_BGR2LAB)
 
-        for i in color_range:
-            if i in self.__target_color:
-                detect_color = i
+        for detect_color in color_range:
+            
+            if detect_color in self.__target_color:
+
                 if get_rois[detect_color]:
                     get_rois[detect_color] = False
                     frame_gb = getMaskROI(frame_gb, rois[detect_color], self.size)
@@ -101,6 +96,7 @@ class Perception:
                 closed = cv2.morphologyEx(opened, cv2.MORPH_CLOSE, np.ones((6, 6), np.uint8))
                 contours = cv2.findContours(closed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)[-2]
                 areaMaxContour, area_max = self.getAreaMaxContour(contours)
+                
                 if area_max > 2500:
                     self.rect = cv2.minAreaRect(areaMaxContour)
                     box = np.int0(cv2.boxPoints(self.rect))
