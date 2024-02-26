@@ -14,7 +14,6 @@ from ArmIK.ArmMoveIK import *
 import HiwonderSDK.Board as Board
 from CameraCalibration.CalibrationConfig import *
 
-
 class Perception: 
 
     def __init__(self): 
@@ -96,7 +95,7 @@ class Perception:
                 closed = cv2.morphologyEx(opened, cv2.MORPH_CLOSE, np.ones((6, 6), np.uint8))
                 contours = cv2.findContours(closed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)[-2]
                 areaMaxContour, area_max = self.getAreaMaxContour(contours)
-                
+
                 if area_max > 2500:
                     self.rect = cv2.minAreaRect(areaMaxContour)
                     box = np.int0(cv2.boxPoints(self.rect))
