@@ -84,6 +84,7 @@ class Perception:
             contours = cv2.findContours(closed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)[-2]
             areaMaxContour, area_max = self.getAreaMaxContour(contours)
             return areaMaxContour, area_max
+        return None, 0  
 
     def process_contour(self, img, areaMaxContour, area_max, detect_color):
         if area_max > 2500:
