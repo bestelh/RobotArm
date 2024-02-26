@@ -12,7 +12,7 @@ from ArmIK.ArmMoveIK import *
 import HiwonderSDK.Board as Board
 from CameraCalibration.CalibrationConfig import *
 import numpy as np
-
+ 
 class ObjectTracker:
     def __init__(self):
         self.target_color = ('red','green','blue')
@@ -71,7 +71,7 @@ class ObjectTracker:
                 rect = cv2.minAreaRect(areaMaxContour)
                 box = np.int0(cv2.boxPoints(rect))
 
-                #self.roi = self.get_roi_from_box(box)
+                self.roi = self.getROI(box)
                 self.get_roi = True
 
                 img_centerx, img_centery = self.get_center(rect, self.roi, self.size, self.square_length)
