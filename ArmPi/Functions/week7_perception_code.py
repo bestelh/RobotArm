@@ -22,14 +22,14 @@ class Perception:
         self.__isRunning = False 
         self.rect = None 
         self.size = (640, 480) 
-        self.rotation_angle = 0 
-        self.unreachable = False 
-        self.world_X, self.world_Y = 0, 0 
-        self.world_x, self.world_y = 0, 0 
-        self.t1 = 0 
+        #self.rotation_angle = 0 
+        #self.unreachable = False 
+        # self.world_X, self.world_Y = 0, 0 
+        # self.world_x, self.world_y = 0, 0 
+        #self.t1 = 0 
         self.roi = () 
         self.get_roi = False 
-        self.last_x, self.last_y = 0, 0 
+        #self.last_x, self.last_y = 0, 0 
         self.my_camera = Camera.Camera() 
         self.my_camera.camera_open()
         self.range_rgb = {
