@@ -14,6 +14,19 @@ from ArmIK.ArmMoveIK import *
 import HiwonderSDK.Board as Board
 from CameraCalibration.CalibrationConfig import *
 
+if sys.version_info.major == 2:
+    print('Please run this program with python3!')
+    sys.exit(0)
+
+AK = ArmIK()
+
+def initMove():
+    Board.setBusServoPulse(1, servo1 - 50, 300)
+    Board.setBusServoPulse(2, 500, 500)
+    AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90, 1500)
+
+
+servo1 = 500
 
 class Move:
     def __init__(self):
@@ -78,7 +91,48 @@ class Move:
                         AK.setPitchRangeMoving((self.world_X, self.world_Y, 2), -90, -90, 0, 1000)  # 降低高度
                         time.sleep(2)
 
-                        # ... (continue with the rest of your code)
+                        if not self.__isRunning:
+                            continue
+                        Board.setBusServoPulse(1, servo1, 500)  # 夹持器闭合
+                        time.sleep(1)
+                        
+                        if not self.__isRunning:
+                            continue
+                        Board.setBusServoPulse(2, 500, 500)
+                        AK.setPitchRangeMoving((self.world_X, self.world_Y, 12), -90, -90, 0, 1000)  # 机械臂抬起
+                        time.sleep(1)
+                        
+                        if not self.__isRunning:
+                            continue
+                        # 对不同颜色方块进行分类放置
+                        result = AK.setPitchRangeMoving((coordinate[self.detect_color][0], coordinate[self.detect_color][1], 12), -90, -90, 0)   
+                        time.sleep(result[2]/1000)
+                        
+                        if not self.__isRunning:
+                            continue
+                        servo2_angle = getAngle(coordinate[self.detect_color][0], coordinate[self.detect_color][1], -90)
+                        Board.setBusServoPulse(2, servo2_angle, 500)
+                        time.sleep(0.5)
+
+                        if not self.__isRunning:
+                            continue
+                        AK.setPitchRangeMoving((coordinate[self.detect_color][0], coordinate[self.detect_color][1], coordinate[self.detect_color][2] + 3), -90, -90, 0, 500)
+                        time.sleep(0.5)
+                        
+                        if not self.__isRunning:
+                            continue
+                        AK.setPitchRangeMoving((coordinate[self.detect_color]), -90, -90, 0, 1000)
+                        time.sleep(0.8)
+                        
+                        if not self.__isRunning:
+                            continue
+                        Board.setBusServoPulse(1, servo1 - 200, 500)  # 爪子张开，放下物体
+                        time.sleep(0.8)
+                        
+                        if not self.__isRunning:
+                            continue                    
+                        AK.setPitchRangeMoving((coordinate[self.detect_color][0], coordinate[self.detect_color][1], 12), -90, -90, 0, 800)
+                        time.sleep(0.8)
 
                         initMove()  # 回到初始位置
                         time.sleep(1.5)
