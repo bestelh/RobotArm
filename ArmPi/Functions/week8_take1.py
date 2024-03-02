@@ -248,10 +248,14 @@ if __name__ == '__main__':
 
     perception.setTargetColor('red')
     perception.start()
-    perception.stop()
-    perception.exit()
 
     move.setTargetColor('red')
     move.start()
+
+    main_loop(perception, move)
+
+    perception.stop()
+    perception.exit()
+
     move.stop()
     move.exit()
