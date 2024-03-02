@@ -19,11 +19,10 @@ Wrist=3
 Elbow=4
 Shoulder=5
 Shoulder_twist=6
-
-
 servo_angle=500
 
 AK = ArmIK()
+
 class Movement: 
 
     def _init_(self):
@@ -37,7 +36,7 @@ class Movement:
     def initMove(self):
         Board.setBusServoPulse(1, servo_angle - 50, 300)
         Board.setBusServoPulse(2, 500, 500)
-        self.AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90, 1500)
+        AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90, 1500)
 
     def openGripper(self):
         Board.setBusServoPulse(1, servo_angle - 280, 500)
@@ -46,10 +45,20 @@ class Movement:
     def closeGripper(self):
         Board.setBusServoPulse(1, servo_angle, 500)
 
-
+    def move_to_block(self, x, y, z):
+        self.openGripper()
+        result = AK.setPitchRangeMoving((-2, 18, 1.5), -90, -90, 1000)
+        if result == False:
+            print("Unreachable 0")
+        else:
+            servo2_angle = getAngle(-2, 18, self.angle)
+            Board.setBusServoPulse(2, servo2_angle, 500)
+            time.sleep(3)
+            self.closeGripper()
 
 if __name__ == "__main__":
     move=Movement()
-    move.openGripper()
-    time.sleep(2)
-    move.closeGripper()
+    move.initMove()
+    move.move_to_block(1,20,1.5)
+    time.sleep(5)
+    move.initMove()

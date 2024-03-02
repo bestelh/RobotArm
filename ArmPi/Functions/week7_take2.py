@@ -139,8 +139,4 @@ if __name__ == '__main__':
     perception = Perception()
     perception.start()
     main_loop(perception)
-    for color in ['red', 'blue', 'green']:
-        if perception.positions[color] is not None:
-            print(f"{color} block detected at position {perception.positions[color]}")
-        if perception.locations[color] is not None:
-            print(f"{color} block located at {perception.locations[color]}")
+    
