@@ -125,20 +125,20 @@ class Perception:
 
         return img
 
-    def main_loop(self):
-        while True:
-            img = self.my_camera.frame
-            if img is not None:
-                frame = img.copy()
-                Frame = self.run(frame)
-                cv2.imshow('Frame', Frame)
-                key = cv2.waitKey(1)
-                if key == 27:
-                    break
-        self.my_camera.camera_close()
-        cv2.destroyAllWindows()
+def main_loop(perception):
+    while True:
+        img = perception.my_camera.frame
+        if img is not None:
+            frame = img.copy()
+            Frame = perception.run(frame)
+            cv2.imshow('Frame', Frame)
+            key = cv2.waitKey(1)
+            if key == 27:
+                break
+    perception.my_camera.camera_close()
+    cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     perception = Perception()
     perception.start()
-    perception.main_loop()
+    main_loop(perception)
