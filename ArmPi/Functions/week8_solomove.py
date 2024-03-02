@@ -48,6 +48,9 @@ class Move:
         self.start_pick_up = None
         self.first_move = None
 
+    def start(self):
+        self.__isRunning = True
+
     def move(self, block_location, block_color):
         # 不同颜色木块放置坐标(x, y, z)
         coordinate = {
@@ -158,4 +161,5 @@ class Move:
 if __name__ == '__main__':
     move_location=(2, 20, 1.5)
     move_instance = Move()
+    move_instance.start()  # Start the movement
     move_instance.move(move_location, 'red')
