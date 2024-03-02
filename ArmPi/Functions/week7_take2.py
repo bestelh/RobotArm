@@ -119,9 +119,6 @@ class Perception:
         for detect_color in color_range:
             areaMaxContour, area_max = self.process_color(frame_gb, frame_lab, detect_color)
             img = self.process_contour(img, areaMaxContour, area_max, detect_color)
-        
-        print('Positions:', self.positions)
-        print('Locations:', self.locations)
 
         return img
 
@@ -142,3 +139,8 @@ if __name__ == '__main__':
     perception = Perception()
     perception.start()
     main_loop(perception)
+    for color in ['red', 'blue', 'green']:
+        if perception.positions[color] is not None:
+            print(f"{color} block detected at position {perception.positions[color]}")
+        if perception.locations[color] is not None:
+            print(f"{color} block located at {perception.locations[color]}")
