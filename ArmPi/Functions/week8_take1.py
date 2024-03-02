@@ -14,7 +14,29 @@ from ArmIK.ArmMoveIK import *
 import HiwonderSDK.Board as Board
 from CameraCalibration.CalibrationConfig import *
 
-class Perception: 
+
+class BaseClass:
+    def __init__(self):
+        self.__target_color = None
+        self.__isRunning = False
+
+    def setTargetColor(self, target_color):
+        self.__target_color = target_color
+        return (True, ())
+
+    def start(self):
+        self.__isRunning = True
+        print("Start")
+
+    def stop(self):
+        self.__isRunning = False
+        print("Stop")
+
+    def exit(self):
+        self.__isRunning = False
+        print("Exit")
+
+class Perception(BaseClass): 
 
     def __init__(self): 
         self.__target_color = ('red', 'blue', 'green') 
@@ -32,11 +54,6 @@ class Perception:
             'black': (0, 0, 0),
             'white': (255, 255, 255),}
 
-
-    def setTargetColor(self, target_color):
-        self.__target_color = target_color
-        return (True, ())
-
     def getAreaMaxContour(self, contours):
         contour_area_temp = 0
         contour_area_max = 0
@@ -50,18 +67,6 @@ class Perception:
                     area_max_contour = c
 
         return area_max_contour, contour_area_max  # Return the largest contour
-
-    def start(self):
-        self.__isRunning = True
-        print("ColorTracking Start")
-
-    def stop(self):
-        self.__isRunning = False
-        print("ColorTracking Stop")
-
-    def exit(self):
-        self.__isRunning = False
-        print("ColorTracking Exit")
 
     def draw_lines(self, img):
         img_h, img_w = img.shape[:2]
@@ -125,8 +130,13 @@ class Perception:
 
         return img
 
-
-class Move:
+rect = None
+size = (640, 480)
+rotation_angle = 0
+unreachable = False
+world_X, world_Y = 0, 0
+world_x, world_y = 0, 0
+class Move(BaseClass):
     def __init__(self):
         # Initialize your class attributes here
         self.rect = None
@@ -146,7 +156,7 @@ class Move:
         self.count = None
         self.start_pick_up = None
         self.first_move = None
-        
+
     def process_perception_data(self, perception):
         self.detect_color = perception.__target_color
         self.locations = perception.locations
@@ -162,7 +172,6 @@ class Move:
             if __isRunning:
                 if first_move and start_pick_up:  
                     action_finish = False
-                    set_rgb(detect_color)
                     setBuzzer(0.1)
                     result = AK.setPitchRangeMoving((world_X, world_Y - 2, 5), -90, -90, 0)
                     if result == False:
@@ -174,7 +183,6 @@ class Move:
                     first_move = False
                     action_finish = True
                 elif not first_move and not unreachable:  # 不是第一次检测到物体
-                    set_rgb(detect_color)
                     if track:  # 如果是跟踪阶段
                         if not __isRunning:  # 停止以及退出标志位检测
                             continue
@@ -237,5 +245,13 @@ def main_loop(perception, move):
 if __name__ == '__main__':
     perception = Perception()
     move = Move()
+
+    perception.setTargetColor('red')
     perception.start()
-    main_loop(perception, move)
+    perception.stop()
+    perception.exit()
+
+    move.setTargetColor('red')
+    move.start()
+    move.stop()
+    move.exit()
