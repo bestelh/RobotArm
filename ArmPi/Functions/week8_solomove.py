@@ -52,6 +52,7 @@ class Move:
         self.__isRunning = True
 
     def move(self, block_location, block_color):
+        self.detect_color=block_color
         # 不同颜色木块放置坐标(x, y, z)
         coordinate = {
             'red':   (-15 + 0.5, 12 - 0.5, 1.5),
