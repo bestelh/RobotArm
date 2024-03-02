@@ -119,6 +119,9 @@ class Perception:
         for detect_color in color_range:
             areaMaxContour, area_max = self.process_color(frame_gb, frame_lab, detect_color)
             img = self.process_contour(img, areaMaxContour, area_max, detect_color)
+        
+        print('Positions:', self.positions)
+        print('Locations:', self.locations)
 
         return img
 
