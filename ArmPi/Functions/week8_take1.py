@@ -12,9 +12,16 @@ from ArmIK.Transform import *
 from ArmIK.ArmMoveIK import *
 import HiwonderSDK.Board as Board
 from CameraCalibration.CalibrationConfig import *
+Gripper_servo = 1
+Gripper_twist=2
+Wrist=3
+Elbow=4
+Shoulder=5
+Shoulder_twist=6
 
-servo1=500
+
+servo_angle=500
 
 AK = ArmIK()
 
-Board.setBusServoPulse(1, servo1 - 280, 500)
+Board.setBusServoPulse(Gripper_servo, servo_angle - 280, 500)
