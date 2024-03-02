@@ -159,7 +159,7 @@ class Move:
                 time.sleep(0.01)
 
 if __name__ == '__main__':
-    move_location=(2, 20, 1.5)
     move_instance = Move()
     move_instance.start()  # Start the movement
+    move_location=(2, 20, 1.5)
     move_instance.move(move_location, 'red')
