@@ -123,7 +123,8 @@ class Perception:
 
         img = self.draw_lines(img)
 
-        self.block_data = self.get_block_data()
+        block_data = self.get_block_data()
+        print(block_data)
 
         if not self.__isRunning:
             return img
@@ -153,5 +154,5 @@ if __name__ == '__main__':
     perception = Perception()
     perception.start()
     main_loop(perception)
-    print(perception.block_data)
+    
     
