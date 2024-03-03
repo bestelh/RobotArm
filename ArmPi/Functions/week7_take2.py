@@ -19,6 +19,7 @@ class Perception:
     def __init__(self): 
         self.__target_color = ('red', 'blue', 'green') 
         self.__isRunning = False 
+        self.rotation_angle=0
         self.rect = None 
         self.size = (640, 480) 
         self.roi = () 
@@ -94,13 +95,24 @@ class Perception:
             self.get_rois[detect_color] = True
             img_centerx, img_centery = getCenter(self.rect, self.rois[detect_color], self.size, square_length)
             world_x, world_y = convertCoordinate(img_centerx, img_centery, self.size)
+            self.rotation_angle = self.rect[2]
             self.positions[detect_color] = (img_centerx, img_centery)
             self.locations[detect_color] = (world_x, world_y)
             cv2.drawContours(img, [box], -1, self.range_rgb[detect_color], 2)
             cv2.putText(img, '(' + str(world_x) + ',' + str(world_y) + ')', (min(box[0, 0], box[2, 0]), box[2, 1] - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.range_rgb[detect_color], 1)
         return img
-
+    
+    def get_block_data(self):
+        block_data = {}
+        for color in ['red', 'blue', 'green']:
+            block_data[color] = {
+                'position': self.positions[color],
+                'location': self.locations[color],
+                'rotation_angle': self.rotation_angle
+            }
+        return block_data
+    
     def run(self, img):
         self.positions = {'red': None, 'blue': None, 'green': None}
         self.locations = {'red': None, 'blue': None, 'green': None}
@@ -110,6 +122,8 @@ class Perception:
         img_copy = img.copy()
 
         img = self.draw_lines(img)
+
+        self.block_data = self.get_block_data()
 
         if not self.__isRunning:
             return img
@@ -139,4 +153,5 @@ if __name__ == '__main__':
     perception = Perception()
     perception.start()
     main_loop(perception)
+    print(perception.block_data)
     
