@@ -216,9 +216,25 @@ def main_loop(perception):
 def move_blocks(move):
     while True:
         block_data = block_data_queue.get()
-        move.move_to_block(block_data, 'red')
+        x = block_data['red']['location'][0]
+        y = block_data['red']['location'][1]
+        z = 1.5
+        angle_twist = block_data['red']['rotation_angle']
+        AK.setPitchRangeMoving((x, y, z), -90, -90, 1000)
+        move.openGripper()
+        block_data = block_data_queue.get()  # Get updated block_data
+        servo2_angle = getAngle(x, y, angle_twist)
+        Board.setBusServoPulse(2, servo2_angle, 500)
+        time.sleep(3)
+        move.closeGripper()
         time.sleep(2)
-        move.initMove()
+        move.initBack()
+        time.sleep(2)
+        block_data = block_data_queue.get()  # Get updated block_data
+        AK.setPitchRangeMoving(move.coordinate['red'], -90, -90, 1000)
+        time.sleep(3)
+        move.openGripper()
+        time.sleep(1)
 
 if __name__ == "__main__":
     perception = Perception()
