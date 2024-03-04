@@ -180,7 +180,8 @@ class Movement:
         Board.setBusServoPulse(2, servo2_angle, 500)
         time.sleep(3)
         self.closeGripper()
-
+        AK.setPitchRangeMoving(self.coordinate[color], -90, -90, 1000)
+        
 block_data_queue = queue.Queue()
 
 def main_loop(perception):
