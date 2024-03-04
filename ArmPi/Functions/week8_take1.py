@@ -211,12 +211,12 @@ def main_loop(perception):
 
 def move_blocks(move):
     while True:
-        block_data = block_data_queue.get()
-        move.move_to_block(block_data, 'red')
+        if not block_data_queue.empty():  # Check if there is new block_data in the queue
+            block_data = block_data_queue.get()  # Get the latest block_data
+        move.move_to_block(block_data, 'red')  # Use the latest block_data to move to block
         time.sleep(2)
         move.initMove()
         time.sleep(2)
-
 if __name__ == "__main__":
     perception = Perception()
     perception.start()
