@@ -188,7 +188,7 @@ class Movement:
         move.initBack()
         time.sleep(2)
         AK.setPitchRangeMoving(self.coordinate[color], -90, -90, 1000)
-        time.sleep(1)
+        time.sleep(3)
         self.openGripper()
         time.sleep(1)
 
