@@ -172,7 +172,7 @@ class Movement:
         time.sleep(1)
 
     def closeGripper(self):
-        Board.setBusServoPulse(1, servo_angle +50 , 500)
+        Board.setBusServoPulse(1, servo_angle +75 , 500)
 
     def move_to_block(self, block_data,color):
         x = block_data[color]['location'][0]
@@ -205,7 +205,7 @@ def main_loop(perception):
                 cv2.imshow('Frame', Frame)
                 key = cv2.waitKey(1)
                 block_data = perception.get_block_data()
-                print(block_data)
+                #print(block_data)
                 block_data_queue.put(block_data)
                 if key == 27:
                     break
@@ -217,7 +217,9 @@ def main_loop(perception):
 
 def move_blocks(move):
     while True:
+        print('First',block_data)
         block_data = block_data_queue.get()
+        print('Second', block_data)
         move.move_to_block(block_data, 'red')
         time.sleep(2)
         move.initMove()
