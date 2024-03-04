@@ -217,7 +217,7 @@ def main_loop(perception):
 
 def move_blocks(move):
     while True:
-        block_data = block_data_queue.get(block_data)
+        block_data = block_data_queue.get()
         print('Second', block_data)
         move.move_to_block(block_data, 'red')
         time.sleep(2)
