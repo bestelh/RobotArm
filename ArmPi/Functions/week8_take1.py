@@ -171,7 +171,7 @@ class Movement:
         time.sleep(1)
 
     def closeGripper(self):
-        Board.setBusServoPulse(1, servo_angle +100, 500)
+        Board.setBusServoPulse(1, servo_angle +25 , 500)
 
     def move_to_block(self, block_data,color):
         x = block_data[color]['location'][0]
@@ -210,16 +210,11 @@ def main_loop(perception):
     cv2.destroyAllWindows()
 
 def move_blocks(move):
-    block_data = None
-    while True:
-        if not block_data_queue.empty():  # Check if there is new block_data in the queue
-            block_data = block_data_queue.get()  # Get the latest block_data
-        if block_data is not None:
-            move.move_to_block(block_data, 'red')  # Use the latest block_data to move to block
+        block_data = block_data_queue.get()
+        move.move_to_block(block_data, 'red')
         time.sleep(2)
         move.initMove()
-        time.sleep(2)
-        
+
 if __name__ == "__main__":
     perception = Perception()
     perception.start()
