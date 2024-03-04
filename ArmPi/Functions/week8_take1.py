@@ -205,7 +205,9 @@ def main_loop(perception):
                 cv2.imshow('Frame', Frame)
                 key = cv2.waitKey(1)
                 block_data = perception.get_block_data()
-                #print(block_data)
+                # Clear the queue before putting new item
+                while not block_data_queue.empty():
+                    block_data_queue.get()
                 block_data_queue.put(block_data)
                 if key == 27:
                     break
