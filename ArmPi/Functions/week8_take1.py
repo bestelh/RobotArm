@@ -210,13 +210,16 @@ def main_loop(perception):
     cv2.destroyAllWindows()
 
 def move_blocks(move):
+    block_data = None
     while True:
         if not block_data_queue.empty():  # Check if there is new block_data in the queue
             block_data = block_data_queue.get()  # Get the latest block_data
-        move.move_to_block(block_data, 'red')  # Use the latest block_data to move to block
+        if block_data is not None:
+            move.move_to_block(block_data, 'red')  # Use the latest block_data to move to block
         time.sleep(2)
         move.initMove()
         time.sleep(2)
+        
 if __name__ == "__main__":
     perception = Perception()
     perception.start()
