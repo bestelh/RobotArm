@@ -30,6 +30,7 @@ class Perception:
         self.__target_color = ('red', 'blue', 'green') 
         self.__isRunning = False 
         self.rotation_angle=0
+        self.block_data= None 
         self.positions = {'red': None, 'blue': None, 'green': None}
         self.locations = {'red': None, 'blue': None, 'green': None}
         self.rois = {'red': None, 'blue': None, 'green': None}
@@ -118,14 +119,14 @@ class Perception:
         return img
     
     def get_block_data(self):
-        block_data = {}
+        self.block_data = {}
         for color in ['red', 'blue', 'green']:
-            block_data[color] = {
+            self.block_data[color] = {
                 'position': self.positions[color],
                 'location': self.locations[color],
                 'rotation_angle': self.rotation_angle
             }
-        return block_data
+        return self.block_data
     
     def run(self, img):
         
@@ -133,8 +134,8 @@ class Perception:
 
         img = self.draw_lines(img)
 
-        block_data = self.get_block_data()
-        print(block_data)
+        self.block_data = self.get_block_data()
+        #print(block_data)
 
         if not self.__isRunning:
             return img
@@ -204,6 +205,7 @@ def main_loop(perception):
                 cv2.imshow('Frame', Frame)
                 key = cv2.waitKey(1)
                 block_data = perception.get_block_data()
+                print(block_data)
                 block_data_queue.put(block_data)
                 if key == 27:
                     break
@@ -214,27 +216,10 @@ def main_loop(perception):
         cv2.destroyAllWindows()
 
 def move_blocks(move):
-    while True:
         block_data = block_data_queue.get()
-        x = block_data['red']['location'][0]
-        y = block_data['red']['location'][1]
-        z = 1.5
-        angle_twist = block_data['red']['rotation_angle']
-        AK.setPitchRangeMoving((x, y, z), -90, -90, 1000)
-        move.openGripper()
-        block_data = block_data_queue.get()  # Get updated block_data
-        servo2_angle = getAngle(x, y, angle_twist)
-        Board.setBusServoPulse(2, servo2_angle, 500)
-        time.sleep(3)
-        move.closeGripper()
+        move.move_to_block(block_data, 'red')
         time.sleep(2)
-        move.initBack()
-        time.sleep(2)
-        block_data = block_data_queue.get()  # Get updated block_data
-        AK.setPitchRangeMoving(move.coordinate['red'], -90, -90, 1000)
-        time.sleep(3)
-        move.openGripper()
-        time.sleep(1)
+        move.initMove()
 
 if __name__ == "__main__":
     perception = Perception()
