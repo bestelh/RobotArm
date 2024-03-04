@@ -188,6 +188,9 @@ class Movement:
         move.initBack()
         time.sleep(2)
         AK.setPitchRangeMoving(self.coordinate[color], -90, -90, 1000)
+        time.sleep(1)
+        self.openGripper()
+        time.sleep(1)
 
 block_data_queue = queue.Queue()
 
