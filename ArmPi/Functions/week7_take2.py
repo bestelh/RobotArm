@@ -20,6 +20,10 @@ class Perception:
         self.__target_color = ('red', 'blue', 'green') 
         self.__isRunning = False 
         self.rotation_angle=0
+        self.positions = {'red': None, 'blue': None, 'green': None}
+        self.locations = {'red': None, 'blue': None, 'green': None}
+        self.rois = {'red': None, 'blue': None, 'green': None}
+        self.get_rois = {'red': False, 'blue': False, 'green': False}
         self.rect = None 
         self.size = (640, 480) 
         self.roi = () 
@@ -114,10 +118,10 @@ class Perception:
         return block_data
     
     def run(self, img):
-        self.positions = {'red': None, 'blue': None, 'green': None}
-        self.locations = {'red': None, 'blue': None, 'green': None}
-        self.rois = {'red': None, 'blue': None, 'green': None}
-        self.get_rois = {'red': False, 'blue': False, 'green': False}
+        # self.positions = {'red': None, 'blue': None, 'green': None}
+        # self.locations = {'red': None, 'blue': None, 'green': None}
+        # self.rois = {'red': None, 'blue': None, 'green': None}
+        # self.get_rois = {'red': False, 'blue': False, 'green': False}
 
         img_copy = img.copy()
 
