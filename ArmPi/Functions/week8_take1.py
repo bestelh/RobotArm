@@ -6,6 +6,8 @@ import cv2
 import time
 import math
 import Camera
+import threading
+import queue
 import numpy as np
 from LABConfig import *
 from ArmIK.Transform import *
@@ -179,6 +181,8 @@ class Movement:
         time.sleep(3)
         self.closeGripper()
 
+block_data_queue = queue.Queue()
+
 def main_loop(perception):
     while True:
         img = perception.my_camera.frame
@@ -187,22 +191,32 @@ def main_loop(perception):
             Frame = perception.run(frame)
             cv2.imshow('Frame', Frame)
             key = cv2.waitKey(1)
-            print(perception.get_block_data())
+            block_data = perception.get_block_data()
+            block_data_queue.put(block_data)
             if key == 27:
                 break
     perception.my_camera.camera_close()
     cv2.destroyAllWindows()
 
+def move_blocks(move):
+    while True:
+        block_data = block_data_queue.get()
+        move.move_to_block(block_data, 'red')
+        time.sleep(2)
+        move.initMove()
+
 if __name__ == "__main__":
     perception = Perception()
     perception.start()
-    main_loop(perception)
-    block_data = perception.block_data
-    print(block_data)
+    move = Movement()
+    move.initMove()
+    time.sleep(2)
 
-    move=Movement()
-    move.initMove()
-    time.sleep(2)
-    move.move_to_block(block_data,'red')
-    time.sleep(2)
-    move.initMove()
+    main_loop_thread = threading.Thread(target=main_loop, args=(perception,))
+    move_blocks_thread = threading.Thread(target=move_blocks, args=(move,))
+
+    main_loop_thread.start()
+    move_blocks_thread.start()
+
+    main_loop_thread.join()
+    move_blocks_thread.join()
