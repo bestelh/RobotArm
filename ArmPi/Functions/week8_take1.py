@@ -195,19 +195,23 @@ class Movement:
 block_data_queue = queue.Queue()
 
 def main_loop(perception):
-    while True:
-        img = perception.my_camera.frame
-        if img is not None:
-            frame = img.copy()
-            Frame = perception.run(frame)
-            cv2.imshow('Frame', Frame)
-            key = cv2.waitKey(1)
-            block_data = perception.get_block_data()
-            block_data_queue.put(block_data)
-            if key == 27:
-                break
-    perception.my_camera.camera_close()
-    cv2.destroyAllWindows()
+    try:
+        while True:
+            img = perception.my_camera.frame
+            if img is not None:
+                frame = img.copy()
+                Frame = perception.run(frame)
+                cv2.imshow('Frame', Frame)
+                key = cv2.waitKey(1)
+                block_data = perception.get_block_data()
+                block_data_queue.put(block_data)
+                if key == 27:
+                    break
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        perception.my_camera.camera_close()
+        cv2.destroyAllWindows()
 
 def move_blocks(move):
         block_data = block_data_queue.get()
