@@ -172,7 +172,7 @@ class Movement:
         time.sleep(1)
 
     def closeGripper(self):
-        Board.setBusServoPulse(1, servo_angle +25 , 500)
+        Board.setBusServoPulse(1, servo_angle +50 , 500)
 
     def move_to_block(self, block_data,color):
         x = block_data[color]['location'][0]
@@ -183,13 +183,13 @@ class Movement:
         self.openGripper()
         servo2_angle = getAngle(x, y, angle_twist)
         Board.setBusServoPulse(2, servo2_angle, 500)
-        time.sleep(3)
+        time.sleep(2)
         self.closeGripper()
         time.sleep(2)
         move.initBack()
         time.sleep(2)
         AK.setPitchRangeMoving(self.coordinate[color], -90, -90, 1000)
-        time.sleep(3)
+        time.sleep(2)
         self.openGripper()
         time.sleep(1)
 
@@ -216,10 +216,12 @@ def main_loop(perception):
         cv2.destroyAllWindows()
 
 def move_blocks(move):
+    while True:
         block_data = block_data_queue.get()
         move.move_to_block(block_data, 'red')
         time.sleep(2)
         move.initMove()
+        time.sleep(2)
 
 if __name__ == "__main__":
     perception = Perception()
