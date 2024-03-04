@@ -162,6 +162,10 @@ class Movement:
         Board.setBusServoPulse(2, 500, 500)
         AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90, 1500)
 
+    def initBack(self):
+        Board.setBusServoPulse(2, 500, 500)
+        AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90, 1500)
+
     def openGripper(self):
         Board.setBusServoPulse(1, servo_angle - 280, 500)
         time.sleep(1)
@@ -181,7 +185,7 @@ class Movement:
         time.sleep(3)
         self.closeGripper()
         time.sleep(2)
-        move.initMove()
+        move.initBack()
         time.sleep(2)
         AK.setPitchRangeMoving(self.coordinate[color], -90, -90, 1000)
 
