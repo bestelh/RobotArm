@@ -147,7 +147,7 @@ def main_loop(perception):
         if img is not None:
             frame = img.copy()
             Frame = perception.run(frame)
-            print(perception.getblock_data())
+            print(perception.get_block_data())
             cv2.imshow('Frame', Frame)
             key = cv2.waitKey(1)
             if key == 27:

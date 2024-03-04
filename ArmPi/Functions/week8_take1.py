@@ -28,6 +28,10 @@ class Perception:
         self.__target_color = ('red', 'blue', 'green') 
         self.__isRunning = False 
         self.rotation_angle=0
+        self.positions = {'red': None, 'blue': None, 'green': None}
+        self.locations = {'red': None, 'blue': None, 'green': None}
+        self.rois = {'red': None, 'blue': None, 'green': None}
+        self.get_rois = {'red': False, 'blue': False, 'green': False}
         self.rect = None 
         self.size = (640, 480) 
         self.roi = () 
@@ -122,16 +126,13 @@ class Perception:
         return block_data
     
     def run(self, img):
-        self.positions = {'red': None, 'blue': None, 'green': None}
-        self.locations = {'red': None, 'blue': None, 'green': None}
-        self.rois = {'red': None, 'blue': None, 'green': None}
-        self.get_rois = {'red': False, 'blue': False, 'green': False}
-
+        
         img_copy = img.copy()
 
         img = self.draw_lines(img)
 
-        self.block_data = self.get_block_data()
+        block_data = self.get_block_data()
+        print(block_data)
 
         if not self.__isRunning:
             return img
@@ -144,21 +145,8 @@ class Perception:
 
         return img
 
-def main_loop(perception):
-    while True:
-        img = perception.my_camera.frame
-        if img is not None:
-            frame = img.copy()
-            Frame = perception.run(frame)
-            cv2.imshow('Frame', Frame)
-            key = cv2.waitKey(1)
-            if key == 27:
-                break
-    perception.my_camera.camera_close()
-    cv2.destroyAllWindows()
-
 class Movement: 
-
+    
     def __init__(self):
         self.coordinate = {
             'red':   (-15 + 0.5, 12 - 0.5, 1.5),
@@ -190,6 +178,20 @@ class Movement:
         Board.setBusServoPulse(2, servo2_angle, 500)
         time.sleep(3)
         self.closeGripper()
+
+def main_loop(perception):
+    while True:
+        img = perception.my_camera.frame
+        if img is not None:
+            frame = img.copy()
+            Frame = perception.run(frame)
+            cv2.imshow('Frame', Frame)
+            key = cv2.waitKey(1)
+            print(perception.get_block_data())
+            if key == 27:
+                break
+    perception.my_camera.camera_close()
+    cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     perception = Perception()
