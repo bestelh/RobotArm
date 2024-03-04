@@ -214,6 +214,7 @@ def main_loop(perception):
         cv2.destroyAllWindows()
 
 def move_blocks(move):
+    while True:
         block_data = block_data_queue.get()
         move.move_to_block(block_data, 'red')
         time.sleep(2)
