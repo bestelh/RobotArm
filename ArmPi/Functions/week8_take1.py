@@ -226,6 +226,7 @@ def move_blocks(move):
         move.initMove()
         time.sleep(2)
 
+
 if __name__ == "__main__":
     perception = Perception()
     perception.start()
